@@ -2,6 +2,11 @@ import re
 from app import db
 from datetime import datetime
 
+# Table for many to many relationship.
+post_tags = db.Table('post_tags',
+                     db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
+                     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')))
+
 
 def slugify(title):
     pattern = r'[^\w+]'
@@ -14,6 +19,7 @@ class Post(db.Model):
     slug = db.Column(db.String(140), unique=True)
     body = db.Column(db.Text)
     created = db.Column(db.DateTime, default=datetime.now())
+    tags = db.relationship('Tag', secondary=post_tags, backref=db.backref('posts'), lazy='dynamic')
 
     def __init__(self, *args, **kwargs):
         super(Post, self).__init__(*args, **kwargs)
